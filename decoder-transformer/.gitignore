@@ -1,0 +1,20 @@
+# Python environment
+.venv/
+__pycache__/
+*.pyc
+
+# Training datasets
+input.txt
+
+# Model checkpoints
+*.pt
+*.pth
+*.ckpt
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
