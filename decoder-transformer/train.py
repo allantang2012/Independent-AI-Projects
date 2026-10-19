@@ -37,3 +37,89 @@ print("Training tokens:", len(train_data))
 print("Validation tokens:", len(val_data))
 print("Example encoded text:", encode("hello"))
 print("Decoded text:", decode(encode("hello")))
+
+
+import torch.nn as nn
+import torch.nn.functional as F
+
+# Hyperparameters
+torch.manual_seed(42)
+
+batch_size = 16
+block_size = 64
+n_embd = 128
+
+
+# Generate a batch of training examples
+def get_batch(split):
+    source = train_data if split == "train" else val_data
+
+    ix = torch.randint(
+        0, len(source) - block_size,
+        (batch_size,)
+    )
+
+    x = torch.stack([
+        source[i:i + block_size] for i in ix
+    ])
+
+    y = torch.stack([
+        source[i + 1:i + block_size + 1] for i in ix
+    ])
+
+    return x.to(device), y.to(device)
+
+
+# Single-head causal self-attention
+class CausalSelfAttention(nn.Module):
+    def __init__(self, n_embd):
+        super().__init__()
+
+        self.query = nn.Linear(n_embd, n_embd, bias=False)
+        self.key = nn.Linear(n_embd, n_embd, bias=False)
+        self.value = nn.Linear(n_embd, n_embd, bias=False)
+
+        # Mask future token positions
+        self.register_buffer(
+            "mask",
+            torch.tril(torch.ones(block_size, block_size))
+        )
+
+    def forward(self, x):
+        B, T, C = x.shape
+
+        q = self.query(x)
+        k = self.key(x)
+        v = self.value(x)
+
+        # Compute scaled attention scores
+        scores = q @ k.transpose(-2, -1) * (C ** -0.5)
+
+        # Hide future characters
+        scores = scores.masked_fill(
+            self.mask[:T, :T] == 0,
+            float("-inf")
+        )
+
+        # Convert scores into attention weights
+        weights = F.softmax(scores, dim=-1)
+
+        # Combine token information
+        out = weights @ v
+
+        return out
+
+
+# Test the attention layer
+embedding = nn.Embedding(vocab_size, n_embd).to(device)
+attention = CausalSelfAttention(n_embd).to(device)
+
+x, y = get_batch("train")
+embedded = embedding(x)
+output = attention(embedded)
+
+print("\n--- Causal Self-Attention Test ---")
+print("Input shape:", x.shape)
+print("Target shape:", y.shape)
+print("Embedded shape:", embedded.shape)
+print("Attention output shape:", output.shape)
