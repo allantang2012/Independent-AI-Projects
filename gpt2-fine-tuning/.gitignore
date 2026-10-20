@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+
+input.txt
+train_tokens.pt
+val_tokens.pt
+
+finetuned_model/
+.env
+.env.*
+.DS_Store
