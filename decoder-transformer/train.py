@@ -184,9 +184,9 @@ for step in range(max_iters + 1):
 # Save model weights and training history
 import json
 
-torch.save(model.state_dict(), "gpt_smoke_test.pt")
+torch.save(model.state_dict(), "gpt_checkpoint.pt")
 
-with open("training_history_smoke_test.json", "w") as f:
+with open("training_history.json", "w") as f:
     json.dump(history, f, indent=2)
 
 print("\nTraining complete!")
