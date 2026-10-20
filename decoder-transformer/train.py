@@ -330,8 +330,8 @@ import time
 
 # Training configuration
 learning_rate = 3e-4
-max_iters = 3000
-eval_interval = 250
+max_iters = 10000
+eval_interval = 500
 eval_batches = 10
 
 optimizer = torch.optim.AdamW(
