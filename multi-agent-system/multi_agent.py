@@ -1,3 +1,5 @@
+from langchain.agents import create_agent
+from research_tools import search_knowledge_base
 
 from typing import TypedDict
 from typing import Literal
@@ -16,6 +18,24 @@ llm = ChatOpenAI(
 )
 
 
+# Create a Researcher Agent with tool access
+research_agent = create_agent(
+    model=llm,
+    tools=[search_knowledge_base],
+    system_prompt=(
+        "You are a research assistant with access to a "
+        "knowledge-base search tool. "
+        "Search the knowledge base before answering. "
+        "Relevant topics are benefits, limitations, "
+        "and reliability. "
+        "Use retrieved information as your evidence. "
+        "Clearly distinguish retrieved facts from "
+        "your own interpretations. "
+        "Do not invent sources."
+    )
+)
+
+
 # Shared state passed between agents
 class ResearchState(TypedDict):
     question: str
@@ -28,25 +48,24 @@ class ResearchState(TypedDict):
 
 # Agent 1: Researcher
 def researcher(state: ResearchState):
-    print("\n[RESEARCHER] Organizing evidence...")
+    print("\n[RESEARCHER] Retrieving information...")
 
-    response = llm.invoke(
-        [
+    result = research_agent.invoke({
+        "messages": [
             (
-                "system",
-                "You are a research assistant. "
-                "Organize only the supplied evidence into "
-                "clear findings. Do not invent facts."
-            ),
-            (
-                "human",
-                f"Question: {state['question']}\n\n"
-                f"Evidence:\n{state['evidence']}"
+                "user",
+                f"Research this question: {state['question']}\n"
+                "Use the knowledge base to find relevant "
+                "information about benefits, limitations, "
+                "and reliability. Summarize the findings."
             )
         ]
-    )
+    })
 
-    return {"research": response.content}
+    # Extract the research agent's final answer
+    research_text = result["messages"][-1].content
+
+    return {"research": research_text}
 
 
 # Agent 2: Analyst
@@ -160,18 +179,9 @@ app = graph.compile()
 
 # Run the workflow
 result = app.invoke({
-    "question": "What are the benefits and limitations of AI agents?",
-    "evidence": (
-        "AI agents can automate multi-step tasks and use tools. "
-        "They can reduce repetitive manual work. "
-        "However, agents may make incorrect decisions, "
-        "incur API costs, and require monitoring."
-    ),
-    "research": (
-    "AI agents automate multi-step tasks and reduce manual work. "
-    "However, they can make mistakes, incur API costs, "
-    "and require human oversight."
-    ),
+    "question": "What are the benefits, limitations, and reliability concerns of AI agents?",
+    "evidence": "",
+    "research": "",
     "analysis": "",
     "final_report": "",
     "next_agent": ""
