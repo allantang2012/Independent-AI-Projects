@@ -4,3 +4,8 @@ langchain-openai
 python-dotenv
 pypdf
 scikit-learn
+mcp[cli]
+langchain-mcp-adapters
+a2a-sdk[http-server]
+httpx
+uvicorn
