@@ -208,3 +208,68 @@ After pushing, open:
 GitHub should automatically display the new README beneath your files.
 
 **For now, complete Steps 1–3 and tell me whether `git push` succeeds.** After that, we'll do the final repository check and write two strong, quantitatively grounded resume bullets for this project.
+
+
+## MCP + A2A Integration
+
+This project also demonstrates communication across two
+AI-agent protocols:
+
+- Model Context Protocol (MCP) for PDF retrieval.
+- Agent2Agent Protocol (A2A) for communication with an
+  independently running Analyst Agent.
+
+### Architecture
+
+Researcher
+    |
+    v
+MCP PDF Retrieval Server
+    |
+    v
+LLM Research Summarization
+    |
+    v
+A2A HTTP / JSON-RPC
+    |
+    v
+Independent Analyst Agent
+    |
+    v
+Evidence-Based Analysis
+
+### Run the Integrated Workflow
+
+Install dependencies:
+
+    pip install -r requirements.txt
+
+Create a .env file containing OPENAI_API_KEY and add
+a text-based PDF to the documents/ directory.
+
+Terminal 1 — Start the A2A Analyst server:
+
+    python a2a_agents/analyst_server.py
+
+Terminal 2 — Run the integrated workflow:
+
+    python mcp_a2a_workflow.py
+
+The workflow starts the MCP server automatically,
+retrieves PDF evidence, summarizes the findings,
+and sends them to the independent Analyst over A2A.
+
+### Verified Capabilities
+
+- MCP tool discovery and execution
+- PDF retrieval with page references
+- A2A Agent Card discovery
+- HTTP/JSON-RPC communication
+- Independent LLM-powered Analyst
+- Source-aware research handoffs
+
+### Limitations
+
+The combined workflow currently uses a predefined
+MCP search followed by an A2A handoff. It does not
+implement autonomous multi-agent task delegation.
