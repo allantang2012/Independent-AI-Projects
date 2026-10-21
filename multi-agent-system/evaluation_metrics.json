@@ -1,15 +1,15 @@
 {
-  "execution_time_seconds": 37.604,
-  "model_calls": 4,
+  "execution_time_seconds": 36.318,
+  "model_calls": 6,
   "tool_calls": 3,
   "tool_names": [
-    "search_knowledge_base",
-    "search_knowledge_base",
-    "search_knowledge_base"
+    "search_research_papers",
+    "search_research_papers",
+    "search_research_papers"
   ],
-  "input_tokens": 2634,
-  "output_tokens": 3482,
-  "total_tokens": 6116,
+  "input_tokens": 5435,
+  "output_tokens": 2779,
+  "total_tokens": 8214,
   "selected_agent": "researcher",
   "report_generated": true
 }

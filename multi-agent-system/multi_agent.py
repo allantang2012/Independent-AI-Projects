@@ -1,5 +1,9 @@
+from langchain.agents.middleware import ToolCallLimitMiddleware
 from langchain.agents import create_agent
-from research_tools import search_knowledge_base
+from research_tools import (
+    search_knowledge_base,
+    search_research_papers
+)
 
 from typing import TypedDict
 from typing import Literal
@@ -21,18 +25,23 @@ llm = ChatOpenAI(
 # Create a Researcher Agent with tool access
 research_agent = create_agent(
     model=llm,
-    tools=[search_knowledge_base],
+    tools=[
+        search_knowledge_base,
+        search_research_papers
+    ],
     system_prompt=(
-        "You are a research assistant with access to a "
-        "knowledge-base search tool. "
-        "Search the knowledge base before answering. "
-        "Relevant topics are benefits, limitations, "
-        "and reliability. "
-        "Use retrieved information as your evidence. "
-        "Clearly distinguish retrieved facts from "
-        "your own interpretations. "
-        "Do not invent sources."
-    )
+        "You are a research assistant. "
+        "Search relevant PDF documents and summarize "
+        "the evidence with source filenames and page numbers. "
+        "Use concise search queries and avoid redundant searches. "
+        "Never invent citations."
+    ),
+    middleware=[
+        ToolCallLimitMiddleware(
+            run_limit=3,
+            exit_behavior="end"
+        )
+    ]
 )
 
 
@@ -51,15 +60,17 @@ def researcher(state: ResearchState):
     print("\n[RESEARCHER] Retrieving information...")
 
     result = research_agent.invoke({
-        "messages": [
-            (
-                "user",
-                f"Research this question: {state['question']}\n"
-                "Use the knowledge base to find relevant "
-                "information about benefits, limitations, "
-                "and reliability. Summarize the findings."
-            )
-        ]
+    "messages": [
+        (
+            "user",
+            f"Research this question: {state['question']}\n"
+            "Choose the appropriate available tools. "
+            "For claims from research papers, include "
+            "the source filename and page number. "
+            "Summarize only information supported "
+            "by the retrieved evidence."
+        )
+    ]
     })
 
     # Extract the research agent's final answer
@@ -176,9 +187,8 @@ app = graph.compile()
 if __name__ == "__main__":
     result = app.invoke({
         "question": (
-            "What are the benefits, limitations, "
-            "and reliability concerns of AI agents?"
-        ),
+        "How does AutoGen enable communication "
+        "and collaboration between multiple AI agents?"),
         "evidence": "",
         "research": "",
         "analysis": "",

@@ -87,8 +87,8 @@ if __name__ == "__main__":
 
     test_input = {
         "question": (
-            "What are the benefits, limitations, "
-            "and reliability concerns of AI agents?"
+        "How does AutoGen enable communication "
+        "and collaboration between multiple AI agents?"
         ),
         "evidence": "",
         "research": "",

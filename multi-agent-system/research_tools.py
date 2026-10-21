@@ -29,3 +29,32 @@ def search_knowledge_base(topic: str) -> str:
         topic.lower().strip(),
         "No information found for this topic."
     )
+
+
+from document_retriever import search_documents
+
+
+@tool
+def search_research_papers(query: str) -> str:
+    """Search local PDF research papers for passages
+    relevant to a research question. Returns source
+    filenames, page numbers, and retrieved text.
+    """
+    print(f"[PDF SEARCH] Searching for: {query}")
+
+    results = search_documents(query, top_k=2)
+
+    if not results:
+        return "No relevant passages found."
+
+    passages = []
+
+    for result in results:
+        passages.append(
+            f"Source: {result['source']}\n"
+            f"Page: {result['page']}\n"
+            f"Similarity: {result['score']:.3f}\n"
+            f"Passage: {result['text'][:1000]}"
+        )
+
+    return "\n\n---\n\n".join(passages)
