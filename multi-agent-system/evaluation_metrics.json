@@ -1,5 +1,5 @@
 {
-  "execution_time_seconds": 42.513,
+  "execution_time_seconds": 37.604,
   "model_calls": 4,
   "tool_calls": 3,
   "tool_names": [
@@ -7,9 +7,9 @@
     "search_knowledge_base",
     "search_knowledge_base"
   ],
-  "input_tokens": 2957,
-  "output_tokens": 3460,
-  "total_tokens": 6417,
+  "input_tokens": 2634,
+  "output_tokens": 3482,
+  "total_tokens": 6116,
   "selected_agent": "researcher",
   "report_generated": true
 }
