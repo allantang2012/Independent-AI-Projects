@@ -39,7 +39,7 @@ research_agent = create_agent(
     middleware=[
         ToolCallLimitMiddleware(
             run_limit=3,
-            exit_behavior="end"
+            exit_behavior="continue"
         )
     ]
 )
@@ -75,6 +75,17 @@ def researcher(state: ResearchState):
 
     # Extract the research agent's final answer
     research_text = result["messages"][-1].content
+
+    if not isinstance(research_text, str) or not research_text.strip():
+        raise RuntimeError("Researcher returned no usable research.")
+
+    if "Tool call limit reached" in research_text:
+        raise RuntimeError(
+             "Researcher stopped before producing a summary."
+    )
+    print("\n--- RESEARCHER RAW OUTPUT ---")
+    print(repr(research_text))
+    print("--- END RESEARCHER OUTPUT ---")
 
     return {"research": research_text}
 
